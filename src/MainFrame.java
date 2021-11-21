@@ -138,7 +138,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		gamesound_table.clear();
 		// load background
 		img_background = new GameImage();
-		img_background.LoadImage(contentPath + "background3" + ".png", 1, 0);
+		img_background.LoadImage(contentPath + "background" + ".png", 1, 0);
 		// load success img
 		img_success = new GameImage();
 		img_success.LoadImage(contentPath + "success" + ".png", 1, 0);
