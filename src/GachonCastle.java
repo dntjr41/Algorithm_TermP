@@ -2,16 +2,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
-public class FourThousand implements ActionListener
-{	
-	static FourThousand game;
+// Play Class
+public class GachonCastle implements ActionListener {
+	static GachonCastle game;
 	static Timer aTimer;
 	static MainFrame mainframe;
 	static long gameTime;
 	
-	public static void main(String args[])
-	{
-		game = new FourThousand();
+	public static void main(String args[]) {
+		game = new GachonCastle();
 		
 		aTimer = new Timer(1, game);
 		

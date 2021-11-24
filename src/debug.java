@@ -1,5 +1,6 @@
-public class debug
-{
+// Debug class
+public class debug {
+
 	public static void print(String str)
 	{
 		System.out.println(str);
