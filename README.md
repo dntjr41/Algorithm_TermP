@@ -118,4 +118,4 @@ Structure, Algorithm, GUI Implementation, Final PPT, Wiki Page
 Algorithm, GUI Implementation, Final PPT, Presentation
 
 * 임인범 201835509 - dlsdlaqja888@gmail.com <br>
-Structure
+Structure, GUI Implementation
