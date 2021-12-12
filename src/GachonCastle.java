@@ -15,8 +15,8 @@ public class GachonCastle implements ActionListener {
 		aTimer = new Timer(1, game);
 		
 		mainframe = new MainFrame(800, 600, "contents/", 4);
-		mainframe.LoadContents(); // 1
-		mainframe.Initialization(); // 2
+		mainframe.LoadContents(); //  first function to execute
+		mainframe.Initialization(); // second function to execute
 		
 		gameTime = 0;
 		aTimer.start();

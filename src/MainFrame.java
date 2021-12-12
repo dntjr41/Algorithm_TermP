@@ -55,11 +55,8 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 			{ 'o', 'o', 'o', 'o', 'o' }, { 'o', 'o', 'o', 'o', 'o' }, { 'x', 'x', 'o', 'o', 'x' } };// x:nil,
 
 	// o:block
-	// methods
-	/**
-	 * 게임프레임의 생성자.
-	 * 게임의 상수 등을 설정한다.
-	 */
+
+	// initializing constants for the game frame
 	public MainFrame(int _width, int _height, String contentPath, int blockkindsCount) {
 		if (_width < 0 || _height < 0)
 			throw new RuntimeException("we need realistic size of a window");
@@ -73,72 +70,60 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		gamestatus = GameStatus.Playing;
 	}
 
-	// start it second
-	/**
-	 * 이 함수를 두번재로 실행.
-	 * 게임의 기본 환경값 (window, 변수)을 설정한다.
-	 */
+
+	// execute it second
+	// setting basic variables for the game environment
 	public void Initialization() {
 		this.Initialization(0);
 		this.Initialization(1);
 	}
 
-	/**
-	 * @param which
-	 *            : App를 끄지 않아도 block의 재생성이 가능하도록 나눔. '1'번인자가 그것.
-	 *            단, window 설정 등이 모두 '0'번에 몰려있으므로, App실행 시 맨 처음에는 '0'을 실행해야 한다.
-	 *            (대신 Initialization(void)를 호출할 수도 있다.)
-	 */
 	public void Initialization(int which) {
-
 		switch (which) {
-		case 0:
-			setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
-			setTitle("Gachon Cattle (가천성) - The Game");
-			setResizable(false);
-			setVisible(true);
-			addKeyListener(this);
-			addMouseListener(this);
-			addMouseMotionListener(this);
-			break;
-		case 1:
-			// set up randomized block kinds
-			int[] blockKindsTable = new int[initial_blockcount];
-			for (int i = 0; i < blockKindsTable.length; i++)
-				blockKindsTable[i] = (i / 2) % blockkindsCount;
+			case 0: // setting window environments and operational functions, so initialize it before case0
+				setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+				setDefaultCloseOperation(EXIT_ON_CLOSE);
+				setTitle("Gachon Cattle (가천성) - The Game");
+				setResizable(false);
+				setVisible(true);
+				addKeyListener(this);
+				addMouseListener(this);
+				addMouseMotionListener(this);
+				break;
+			case 1: // set up randomized block kinds
+				int[] blockKindsTable = new int[initial_blockcount];
+				for (int i = 0; i < blockKindsTable.length; i++)
+					blockKindsTable[i] = (i / 2) % blockkindsCount;
 
-			for (int i = 0; i < blockKindsTable.length; i++) {
-				int tmp = blockKindsTable[i];
-				int ri = i + (int) (Math.random() * (blockKindsTable.length - i));
-				blockKindsTable[i] = blockKindsTable[ri];
-				blockKindsTable[ri] = tmp;
-			}
-
-			// init block
-			for (int i = 0; i < blocklist.length; i++)
-				for (int j = 0; j < blocklist[i].length; j++) {
-					if (boardtable[i][j] == 'x')
-						blocklist[i][j].blockstate = Block.BlockState.dead;
-					else
-						blocklist[i][j].blockstate = Block.BlockState.alive;
+				for (int i = 0; i < blockKindsTable.length; i++) {
+					int tmp = blockKindsTable[i];
+					int ri = i + (int) (Math.random() * (blockKindsTable.length - i));
+					blockKindsTable[i] = blockKindsTable[ri];
+					blockKindsTable[ri] = tmp;
 				}
 
-			int k = 0;
-			for (int i = 0; i < blocklist.length; i++)
-				for (int j = 0; j < blocklist[i].length; j++)
-					if (blocklist[i][j].blockstate != Block.BlockState.dead)
-						blocklist[i][j].BlockKinds = blockKindsTable[k++];
-			// reset game state
-			this.gamestatus = GameStatus.Playing;
-			break;
+				// initialize block
+				for (int i = 0; i < blocklist.length; i++)
+					for (int j = 0; j < blocklist[i].length; j++) {
+						if (boardtable[i][j] == 'x')
+							blocklist[i][j].blockstate = Block.BlockState.dead;
+						else
+							blocklist[i][j].blockstate = Block.BlockState.alive;
+					}
+
+				int k = 0;
+				for (int i = 0; i < blocklist.length; i++)
+					for (int j = 0; j < blocklist[i].length; j++)
+						if (blocklist[i][j].blockstate != Block.BlockState.dead)
+							blocklist[i][j].BlockKinds = blockKindsTable[k++];
+				// reset game state
+				this.gamestatus = GameStatus.Playing;
+				break;
 		}
 	}
 
-	/**`
-	 * 이 함수를 첫번째로 실행.
-	 * 게임에 필요한 그림, 소리 등을 불러온다.
-	 */
+	// execute it first
+	// load images and sounds for the game
 	public void LoadContents() {
 		if (gamesound_table == null)
 			throw new RuntimeException("something's wrong during LoadContents");
@@ -150,7 +135,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		// load success img
 		img_success = new GameImage();
 		img_success.LoadImage(contentPath + "success" + ".png", 1, 0);
-		// load success img
+		// load start img
 		img_start = new GameImage();
 		img_start.LoadImage(contentPath + "start" + ".png", 1, 0);
 
@@ -169,14 +154,6 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 				 * 마지막 인자인 block의 종류를 0으로 고정함으로서 이후 initialization()에서
 				 * 할당하도록 구현함.
 				 */
-				/**
-				 * block margin 추가 및 그에 따른 position 값 정리.
-				 * (margin = 0,0,5,5 == top,right,bottom,left)
-				 * Mouse클릭 시 블럭에서 margin을 제외한 부분만을 인식.
-				 * 
-				 *  그리는 위치는 (기존x-margin_l+r, 기존y-margin_t+b)로 되어있는데
-				 *  본래 margin을 계산해서 정해야 하지만 대신에 코드의 심플함을 선택함. 
-				 */
 				blocklist[i][j] = new Block(i * (50 - 5) + startposx, j * (60 - 5) + startposy, 50,
 						60, 0, 0, 5, 5, 0);
 				blocklist[i][j].LoadContents(contentPath);
@@ -185,7 +162,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 					blocklist[i][j].blockstate = Block.BlockState.dead;
 			}
 
-		// block table을 체크. 'o'의 숫자(블럭)은 짝수여야 함.
+		// check block table. The number of 'o' must be even number
 		initial_blockcount = 0;
 		for (char[] chlist : boardtable)
 			for (char ch : chlist)
@@ -202,122 +179,101 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		}
 	}
 
-	/**
-	 * called by JAVA (automatically)
-	 */
+	// called by JAVA automatically
 	public void update()
 	{
 		repaint();
 	}
 
-	/**
-	 * 게임의 주요 로직을 구현
-	 * 
-	 * @param gameTime
-	 *            : currently not used.
-	 */
+	//main logic of the game
 	public void UpdateGameProc(long gameTime) {
 
 		switch (this.gamestatus) {
 
-		case Started:
-			if (mouseclicked) {
-				this.Initialization(1);
-				mouseclicked = false;
-			}
-			break;
-
-		case Playing:
-			if (start_status == 0) {
-				gamestatus = GameStatus.Started;
-				start_status = 1;
-
+			case Started:
+				if (mouseclicked) {
+					this.Initialization(1);
+					mouseclicked = false;
+				}
 				break;
-			}
 
-			// 각 Block의 mouse event 처리를 위한 하위방향의 call
-			for (Block[] bllist : blocklist)
-				for (Block bl : bllist)
-					bl.UpdateGameProc(mousex, mousey, mouseclicked);
-			mouseclicked = false;
+			case Playing:
+				if (start_status == 0) {
+					gamestatus = GameStatus.Started;
+					start_status = 1;
 
-			// 블럭 삭제 성공 여부를 체크
-			// 우선 현재 선택된 블럭이 2개인지를 확인.
-			if (Block.selectedlist.size() == 2) {
-				if (Block.selectedlist.getFirst() == Block.selectedlist.getLast()) {
-					// 같은 블럭 두번 클릭 시 -> deselect
-					Block.selectedlist.getFirst().blockstate = Block.BlockState.alive;
-					Block.selectedlist.getLast().blockstate = Block.BlockState.alive;
-
-					gamesound_table.get("ding").Play();
-				} else if (checkBlockCol(Block.selectedlist.getFirst(), Block.selectedlist
-						.getLast())) {
-					// 두 블럭이 삭제 가능할 시 -> remove
-					Block.selectedlist.getFirst().blockstate = Block.BlockState.dead;
-					Block.selectedlist.getLast().blockstate = Block.BlockState.dead;
-
-					gamesound_table.get("click").Play();
+					break;
 				}
 
-				else {
-					// 그 외의 사항 -> deselect
-					Block.selectedlist.getFirst().blockstate = Block.BlockState.alive;
-					Block.selectedlist.getLast().blockstate = Block.BlockState.alive;
-
-					gamesound_table.get("ding").Play();
-				}
-				Block.selectedlist.clear();
-			}
-
-			// 게임 종료 체크.
-			boolean isgamefinished = true;
-			for (Block[] bllist : blocklist)
-				for (Block bl : bllist)
-					isgamefinished &= (bl.blockstate == Block.BlockState.dead);
-			if (isgamefinished) {
-				gamestatus = GameStatus.Finished;
-				gamesound_table.get("win").Play();
-			}
-			break;
-
-		case Finished:
-			if (mouseclicked) {
-				this.Initialization(1);
+				// 각 Block의 mouse event 처리를 위한 하위방향의 call
+				for (Block[] bllist : blocklist)
+					for (Block bl : bllist)
+						bl.UpdateGameProc(mousex, mousey, mouseclicked);
 				mouseclicked = false;
 
-				level++;
-			}
-			break;
+				// 블럭 삭제 성공 여부를 체크
+				// 우선 현재 선택된 블럭이 2개인지를 확인.
+				if (Block.selectedlist.size() == 2) {
+					if (Block.selectedlist.getFirst() == Block.selectedlist.getLast()) {
+						// 같은 블럭 두번 클릭 시 -> deselect
+						Block.selectedlist.getFirst().blockstate = Block.BlockState.alive;
+						Block.selectedlist.getLast().blockstate = Block.BlockState.alive;
+
+						gamesound_table.get("ding").Play();
+					} else if (checkBlockCol(Block.selectedlist.getFirst(), Block.selectedlist
+							.getLast())) {
+						// 두 블럭이 삭제 가능할 시 -> remove
+						Block.selectedlist.getFirst().blockstate = Block.BlockState.dead;
+						Block.selectedlist.getLast().blockstate = Block.BlockState.dead;
+
+						gamesound_table.get("click").Play();
+					}
+
+					else {
+						// 그 외의 사항 -> deselect
+						Block.selectedlist.getFirst().blockstate = Block.BlockState.alive;
+						Block.selectedlist.getLast().blockstate = Block.BlockState.alive;
+
+						gamesound_table.get("ding").Play();
+					}
+					Block.selectedlist.clear();
+				}
+
+				// check whether the game is finished
+				boolean isgamefinished = true;
+				for (Block[] bllist : blocklist)
+					for (Block bl : bllist)
+						isgamefinished &= (bl.blockstate == Block.BlockState.dead);
+				if (isgamefinished) {
+					gamestatus = GameStatus.Finished;
+					gamesound_table.get("win").Play();
+				}
+				break;
+
+			case Finished:
+				if (mouseclicked) {
+					this.Initialization(1);
+					mouseclicked = false;
+
+					level++;
+				}
+				break;
 		}
 
-		// 이를 호출해야 Java에서 Game화면을 다시 그린다.
+		// 이를 호출해야 Java에서 Game화면을 다시 그림
 		repaint();
 	}
 
-	/**
-	 * 해당 칸에 블럭이 존재하는지 여부를 리턴.
-	 * 
-	 * @param i
-	 * @param j
-	 * @return True: 블럭이 존재, False: 블럭이 존재하지 않거나 배열 범위를 벗어남.
-	 */
+	// checks the block's state in (i, j)
 	private final boolean isBlockAlreadyExistAt(int i, int j) {
 		if (i < 0 || j < 0 || i >= blocklist.length || j >= blocklist[i].length)
 			return false;
 		return blocklist[i][j].blockstate != Block.BlockState.dead;
 	}
-	/**
-	 * 직선상에 있는 두 블럭의 체크를 위함.
-	 * 
-	 * @param fi
-	 * @param fj
-	 * @param li
-	 * @param lj
-	 * @return True: 삭제 가능.
-	 */
 
+	// check for linear cases
+	// return true when there are no obstacles between two blocks
 	private final boolean checkBlockColSub1(int fi, int fj, int li, int lj) {
-		// check1 (직선 - 'ㅡ')
 		if (fi == li) {
 			for (int j = Math.min(fj, lj) + 1; j < Math.max(fj, lj); j++)
 				if (isBlockAlreadyExistAt(fi, j))
@@ -334,25 +290,14 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		return true;
 	}
 
-	/**
-	 * 'ㄱ'자 모양으로 위치한 블럭 삭제를 체크.
-	 * 내부적으로 checkBlockColSub1을 사용.
-	 * 
-	 * @param fi
-	 * @param fj
-	 * @param li
-	 * @param lj
-	 * @return
-	 */
+	// check for 한번 꺾인 선 - 'ㄱ' 모양
+	// 두 블럭에서 직선으로 연결된 선들이 만나는 점을 기준으로, 각 점들과 직선관계가 성립되는지 확인
 	private final boolean checkBlockColSub2(int fi, int fj, int li, int lj) {
 		if (!isBlockAlreadyExistAt(fi, lj)) {
 			if (checkBlockColSub1(fi, fj, fi, lj) && checkBlockColSub1(fi, lj, li, lj))
 				return true;
 		}
 
-		/**
-		 * else if (!isBlockAlreadyExistAt(li, fj)) ---> if (!isBlockAlreadyExistAt(li, fj))
-		 */
 		if (!isBlockAlreadyExistAt(li, fj)) {
 			if (checkBlockColSub1(li, fj, fi, fj) && checkBlockColSub1(li, fj, li, lj))
 				return true;
@@ -360,21 +305,8 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		return false;
 	}
 
-	/**
-	 * 'ㄷ'자 모양으로 위치한 블럭 삭제를 체크.
-	 * 규칙 상
-	 * x o 1
-	 * 1 o x : x는 empty, o는 장애물, 1은 체크할 두 블럭 > 이 상황은 가능,
-	 * x o x
-	 * 1 o 1 > 이 상황은 불가능.
-	 * 내부적으로 checkBlockColSub2를 사용
-	 * 
-	 * @param fi
-	 * @param fj
-	 * @param li
-	 * @param lj
-	 * @return
-	 */
+	// check for '두번 꺾인 선 - 'ㄷ'모양
+	// checks adjacent block which have 'ㄱ' or 'ㄴ' relation with other block
 	private final boolean checkBlockColSub3(int fi, int fj, int li, int lj) {
 		boolean check = false;
 		if (!isBlockAlreadyExistAt(fi + 1, fj))
@@ -397,26 +329,20 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		return check;
 	}
 
-	/**
-	 * 실제로 체크를 위해 호출할 함수. 블럭 두개를 인자로 받아
-	 * 내부적으로 배열 위치로 변형하여 사용한다.
-	 * 
-	 * @param f
-	 * @param l
-	 * @return
-	 */
+	// checks every case here using upper sub functions, if two blocks are deletable return true
 	private boolean checkBlockCol(Block f, Block l) {
 		boolean check1 = false;
 		boolean check2 = false;
 		boolean check3 = false;
-		// 같은 형태의 블럭인지 확인
+		// check whether two blocks are same kind. Only deletable when two selectable blocks are same kind.
 		if (f.BlockKinds != l.BlockKinds)
 			return false;
-		// getpos -> do better by reverse-calculation of block-position
+		// get location of two blocks in two-dimensional array way
 		int fi = 0, fj = 0;
 		int li = 0, lj = 0;
 		int cnt = 0;
 
+		//initializing location
 		for (int i = 0; i < blocklist.length; i++) {
 			for (int j = 0; j < blocklist[i].length; j++) {
 				if (cnt < 2) {
@@ -454,9 +380,8 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		return (check1 || check2 || check3);
 	}
 
-	/**
-	 * Java에 의해서 호출되는 화면 그리는 함수.
-	 */
+
+	//function to paint the frame
 	public void paint(Graphics g) {
 		// 깜박거림을 방지하기 위해 backbuffer를 생성하여 Double Buffering을 구현.
 		Dimension dim = this.getSize();
@@ -472,17 +397,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 		for (int wi = 0; wi < dim.width; wi += img_background.getWidth())
 			for (int wj = 0; wj < dim.height; wj += img_background.getHeight())
 				backbuf.drawImage(img_background.getImage(), wi, wj, this);
-		// draw blocks (backbuffer를 인자로 전달. Block의 그림은 Block이 그리도록 함)
-		/*
-		 * for (Block[] bllist : blocklist)
-		 * for (Block bl : bllist)
-		 * bl.paint(backbuf, this);
-		 */
 
-		/**
-		 * 블럭 그림안에 그림자가 좌측 하단방향으로 생기게 되어있기 때문에
-		 * 우측 상단의 블럭들 부터 그리게 하여 그림자가 블럭을 덮어쓰지 않게 함. 
-		 */
 		for (int i = blocklist.length - 1; i >= 0; i--)
 			for (int j = 0; j < blocklist[i].length; j++)
 				blocklist[i][j].paint(backbuf, this);
@@ -502,35 +417,30 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 	}
 
 	// ****************************************
-	// ****************************************
-	// ****************************************
-	/**
-	 * x키를 누르면 프로그램 종료
-	 */
+
+
+	// if x is pressed, terminate the game
 	@Override
 	public void keyPressed(KeyEvent arg0) {
 		char keychar = arg0.getKeyChar();
 		switch (keychar) {
-		case 'x':
-		case 'X':
-			System.exit(1);
-			break;
+			case 'x':
+			case 'X':
+				System.exit(1);
+				break;
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent arg0) {
-	// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-	// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * 마우스 클릭 시 변수 값 갱신.
-	 */
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		mousex = arg0.getX();
@@ -539,17 +449,14 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-	// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-	// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * 마우스 클릭 시 변수 값 갱신.
-	 */
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		if ((arg0.getModifiers() & MouseEvent.BUTTON1_MASK) != 0)
@@ -558,17 +465,14 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener, Mou
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-	// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
-	// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * 마우스 이동 시 변수 값 갱신.
-	 */
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
 		mousex = arg0.getX();
